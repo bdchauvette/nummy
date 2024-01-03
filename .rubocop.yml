@@ -1,0 +1,41 @@
+require:
+  - rubocop-minitest
+  - rubocop-packaging
+  - rubocop-rake
+  - rubocop-yard
+
+inherit_gem:
+  syntax_tree: config/rubocop.yml
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+
+GemSpec/DevelopmentDependencies:
+  Enabled: true
+  EnforcedStyle: gemspec
+
+Layout:
+  Enabled: false
+
+Metrics:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: true
+
+Metrics/PerceivedComplexity:
+  Enabled: true
+
+Style/AccessorGrouping:
+  Enabled: true
+  EnforcedStyle: separated
+
+Style/Documentation:
+  Enabled: true
+
+Style/DocumentationMethod:
+  Enabled: true
+
+Style/IfUnlessModifier:
+  Enabled: false

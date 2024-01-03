@@ -1,0 +1,49 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3.0'
+        bundler-cache: true
+    - name: Check formatting
+      run: bundle exec rake stree:check
+    - name: Check for Rubocop violations
+      run: bundle exec rake rubocop
+
+  test:
+    runs-on: ubuntu-latest
+    name: test (ruby@${{ matrix.ruby }})
+    strategy:
+      matrix:
+        ruby:
+          - '3.2.2'
+          - '3.3.0'
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - name: Run tests
+      run: bundle exec rake test COVERAGE=true
+    - name: Print coverage reports
+      if: ${{ always() }}
+      run: |
+        if [ -f coverage/coverage.txt ] ; then
+          cat coverage/coverage.txt
+        else
+          echo "No coverage report found"
+        fi
