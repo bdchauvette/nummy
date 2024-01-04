@@ -2,5 +2,5 @@
 
 module Nummy
   # The current version of the gem.
-  VERSION = "0.1.0"
+  VERSION = "1.0.0"
 end
