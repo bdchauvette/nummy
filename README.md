@@ -146,6 +146,55 @@ end
 > [!TIP]
 > `Nummy::Enum` extends `Enumerable` and iterates over the _values_ of the enum, so you have access to things like `.include?(value)`, `.any?`, and `.find`.
 
+#### Rails / ActiveRecord integration
+
+> [!IMPORTANT]
+> This integration requires `ActiveSupport::Inflector` to be defined.
+
+To use nummy enums as ActiveRecord enums, you can use the `.to_attribute` method:
+
+```ruby
+class Conversation < ActiveRecord::Base
+  class Status < Nummy::Enum
+    ACTIVE = auto
+    ARCHIVED = auto
+  end
+
+  enum :status, Status.to_attribute
+end
+```
+
+This allows you to use all of the Rails magic for enums, like scopes and boolean helpers, while also being able to refer to values in a safer way than hash lookups.
+
+That is, these two are the same:
+
+```ruby
+Conversation.statuses[:active] # => 0
+Conversation::Status::ACTIVE   # => 0
+```
+
+But these are not:
+
+```ruby
+Conversation.statuses[:acitve]
+# => nil
+
+Conversation::Status::ACITVE   # => nil
+# =>
+#  uninitialized constant Conversation::Status::ACITVE (NameError)
+#  Did you mean?  Conversation::Status::ACTIVE
+```
+
+You can get similar behavior using `#fetch`:
+
+```ruby
+Conversation.statuses.fetch(:acitve)
+# => key not found: :acitve (KeyError)
+#    Did you mean?  :active
+```
+
+But that still misses out on some of the DX benefits of using constants, like improved support for things like autocompletion, documentation, and navigation ("Go To Definition") in editors.
+
 ### `Nummy::MemberEnumerable`
 
 `Nummy::MemberEnumerable` is a module that includes `Enumerable` and makes it possible to iterate over any class or module that responds to `members`.
