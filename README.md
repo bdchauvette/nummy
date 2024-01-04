@@ -148,10 +148,7 @@ end
 
 #### Rails / ActiveRecord integration
 
-> [!IMPORTANT]
-> This integration requires `ActiveSupport::Inflector` to be defined.
-
-To use nummy enums as ActiveRecord enums, you can use the `.to_attribute` method:
+To use nummy enums as ActiveRecord enums, you can use the `.to_attribute` method, which converts the keys to `snake_case` by default:
 
 ```ruby
 class Conversation < ActiveRecord::Base
@@ -164,7 +161,13 @@ class Conversation < ActiveRecord::Base
 end
 ```
 
-This allows you to use all of the Rails magic for enums, like scopes and boolean helpers, while also being able to refer to values in a safer way than hash lookups.
+> [!NOTE]
+> `to_attribute` will transform keys using `String#underscore` if it is defined, otherwise it will use `Symbol#downcase`.
+
+> [!TIP]
+> You can also do custom transformations by passing a block to `to_attribute`. See the documentation for more details.
+
+Using `to_attribute` allows you to use all of the Rails magic for enums, like scopes and boolean helpers, while also being able to refer to values in a safer way than hash lookups.
 
 That is, these two are the same:
 
