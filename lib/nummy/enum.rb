@@ -354,6 +354,32 @@ module Nummy
       # Alias to support splatting enums into keyword args.
       alias to_hash to_h
 
+      # Converts the enum to a +Hash+ with snake_case keys.
+      #
+      # This is intended to be used with +ActiveRecord::Enum+, but can be used
+      # with any library that supports defining enums using a +Hash+ and expects
+      # to have lowercase keys.
+      #
+      # @note
+      #   This method _equires +ActiveSupport::Inflector+ to be defined.
+      #
+      # @return [Hash{Symbol => Integer}]
+      #
+      # @example
+      #   class Conversation < ActiveRecord::Base
+      #     class Status < Nummy::Enum
+      #       ACTIVE = auto
+      #       ARCHIVED = auto
+      #     end
+      #
+      #     enum :status, Status.to_attribute
+      #   end
+      def to_attribute
+        to_h.transform_keys! do |key|
+          ::ActiveSupport::Inflector.underscore(key).to_sym
+        end
+      end
+
       # Returns a string representation of +self+.
       #
       # The string will contain the name-value pairs of the constants in +self+.
