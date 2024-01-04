@@ -360,24 +360,51 @@ module Nummy
       # with any library that supports defining enums using a +Hash+ and expects
       # to have lowercase keys.
       #
-      # @note
-      #   This method _equires +ActiveSupport::Inflector+ to be defined.
+      # @overload to_attribute
+      #   If +String#underscore+ is defined, converts the keys to snake_case
+      #   by calling +underscore+ on the stringified key.
       #
-      # @return [Hash{Symbol => Integer}]
+      #   Otherwise, converts each key using +Symbol#downcase+.
       #
-      # @example
-      #   class Conversation < ActiveRecord::Base
-      #     class Status < Nummy::Enum
-      #       ACTIVE = auto
-      #       ARCHIVED = auto
+      #   @return [Hash{Symbol => Object}]
+      #
+      #   @example Using with +ActiveRecord::Enum+.
+      #     class Conversation < ActiveRecord::Base
+      #       class Status < Nummy::Enum
+      #         ACTIVE = auto
+      #         ARCHIVED = auto
+      #       end
+      #
+      #       enum :status, Status.to_attribute
       #     end
       #
-      #     enum :status, Status.to_attribute
-      #   end
-      def to_attribute
-        to_h.transform_keys! do |key|
-          ::ActiveSupport::Inflector.underscore(key).to_sym
+      # @overload to_attribute(&)
+      #   Transforms the keys by calling the given block on each key.
+      #
+      #   @yieldparam key [Symbol]
+      #   @return [Hash{Symbol => Object}]
+      #
+      #   @example Using custom key transformer.
+      #     class ShippingStatus < Nummy::Enum
+      #       IN_TRANSIT = auto
+      #       OUT_FOR_DELIVERY = auto
+      #       DELIVERED = auto
+      #     end
+      #
+      #     ShippingStatus.to_attribute { |key| key.to_s.underscore.camelize.to_sym }
+      #     # => {:InTransit=>0, :OutForDelivery=>1, :Delivered=>2}
+      def to_attribute(&)
+        return to_h.transform_keys!(&) if block_given?
+
+        # Ignore coverage because it's executed in a forked process, which
+        # messes with the coverage collection.
+        # :nocov:
+        if String.method_defined?(:underscore)
+          return to_attribute { |key| key.to_s.underscore.to_sym }
         end
+        # :nocov:
+
+        to_attribute(&:downcase)
       end
 
       # Returns a string representation of +self+.
