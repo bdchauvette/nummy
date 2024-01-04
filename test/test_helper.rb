@@ -7,5 +7,6 @@ require "initializers/minitest"
 
 require "support/assertions"
 require "support/fixtures"
+require "support/utils"
 
 require "nummy"
