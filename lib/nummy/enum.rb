@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "json"
+
 require "nummy/auto_sequenceable"
 require "nummy/ordered_const_enumerable"
 require "nummy/errors"
@@ -353,6 +355,26 @@ module Nummy
 
       # Alias to support splatting enums into keyword args.
       alias to_hash to_h
+
+      # Converts +self+ to a +Hash+ that can be converted to JSON.
+      #
+      # @return [Hash{String => Object}]
+      #
+      # @see .to_json
+      def as_json
+        to_h.transform_keys!(&:to_s)
+      end
+
+      # Converts +self+ to a +Hash+ and serializes it to  a JSON string.
+      #
+      # Supports same options as +JSON#generate+.
+      #
+      # @return [String]
+      #
+      # @see .as_json
+      def to_json(*)
+        as_json.to_json(*)
+      end
 
       # Converts the enum to a +Hash+ with snake_case keys.
       #
