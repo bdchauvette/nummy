@@ -21,8 +21,10 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
+          # not using ruby 3.3 because of this issue:
+          # https://github.com/rubygems/release-gem/issues/2
+          ruby-version: '3.2'
           bundler-cache: true
-          ruby-version: ruby
 
       # Release
       - uses: rubygems/release-gem@v1
